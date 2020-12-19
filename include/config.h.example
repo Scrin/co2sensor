@@ -1,0 +1,13 @@
+#define WIFI_SSID "HomeNet"
+#define WIFI_PASSWORD "hunter1"
+#define HOSTNAME "CO2Sensor"
+#define UPDATE_INTERVAL_MS 10000
+
+#define RX_PIN 13
+#define TX_PIN 15
+
+#define MQTT_SERVER "some.server.example.com"
+#define MQTT_PORT 1883
+#define MQTT_CLIENT_NAME HOSTNAME
+#define MQTT_USER "some_user"
+#define MQTT_PASS "hunter2"
