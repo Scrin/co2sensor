@@ -52,6 +52,8 @@ void setup()
 {
   Serial.begin(115200);
   Serial.println("\nStarting");
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
   sensor.setAutoCalibration(false);
   WiFi.setSleepMode(WIFI_NONE_SLEEP);
   WiFi.mode(WIFI_STA);
@@ -69,7 +71,6 @@ void setup()
 
   client.setServer(MQTT_SERVER, MQTT_PORT);
 
-  digitalWrite(LED_BUILTIN, HIGH);
   checkConnection();
 }
 
@@ -85,7 +86,13 @@ void loop()
     if (m.co2_ppm == 410 || m.co2_ppm == -1)
     {
       Serial.println("CO2 sensor not ready...");
-      delay(UPDATE_INTERVAL_MS);
+      for (int i = 0; i < UPDATE_INTERVAL_MS; i += 10)
+      {
+        digitalWrite(LED_BUILTIN, LOW);
+        delay(1);
+        digitalWrite(LED_BUILTIN, HIGH);
+        delay(9);
+      }
       return;
     }
     else
