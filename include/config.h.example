@@ -11,3 +11,7 @@
 #define MQTT_CLIENT_NAME HOSTNAME
 #define MQTT_USER "some_user"
 #define MQTT_PASS "hunter2"
+
+#define HTTPUpdateServer
+#define USER_HTTP_USERNAME "some_user"
+#define USER_HTTP_PASSWORD "hunter3"

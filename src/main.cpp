@@ -7,6 +7,14 @@
 
 #include "MHZ19.h"
 
+#ifdef HTTPUpdateServer
+#include <ESP8266HTTPUpdateServer.h>
+#include <ESP8266WebServer.h>
+
+ESP8266WebServer httpUpdateServer(80);
+ESP8266HTTPUpdateServer httpUpdater;
+#endif
+
 MHZ19 sensor(RX_PIN, TX_PIN);
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -69,6 +77,15 @@ void setup()
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
+#ifdef HTTPUpdateServer
+  MDNS.begin(MQTT_CLIENT_NAME);
+
+  httpUpdater.setup(&httpUpdateServer, USER_HTTP_USERNAME, USER_HTTP_PASSWORD);
+  httpUpdateServer.begin();
+
+  MDNS.addService("http", "tcp", 80);
+#endif
+
   client.setServer(MQTT_SERVER, MQTT_PORT);
 
   checkConnection();
@@ -83,7 +100,10 @@ void loop()
 
   if (!sensorReady)
   {
-    if (m.co2_ppm == 410 || m.co2_ppm == -1)
+    if (m.co2_ppm == 410    /* MH-Z19B magic number during warmup */
+        || m.co2_ppm == 500 /* MH-Z19C magic number during warmup */
+        || m.co2_ppm == 512 /* MH-Z19C magic number on first query */
+        || m.co2_ppm == -1) /* Invalid data, happens when the MCU on the sensor is still booting */
     {
       Serial.println("CO2 sensor not ready...");
       for (int i = 0; i < UPDATE_INTERVAL_MS; i += 10)
@@ -116,5 +136,13 @@ void loop()
            m.co2_ppm, m.temperature, m.state);
   client.publish(MQTT_CLIENT_NAME "/state", buf);
 
+#ifdef HTTPUpdateServer
+  for (int i = 0; i < UPDATE_INTERVAL_MS; i += 10)
+  {
+    httpUpdateServer.handleClient();
+    delay(10);
+  }
+#else
   delay(UPDATE_INTERVAL_MS);
+#endif
 }
