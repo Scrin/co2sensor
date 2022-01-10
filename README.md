@@ -2,6 +2,8 @@
 
 CO2 sensor for Home Assistant using a MH-Z19 CO2 sensor on a ESP8266 NodeMCU
 
+Note: superseded by [HomeMCU](https://github.com/Scrin/HomeMCU)
+
 ## Setup:
 
 - Clone/download this repository
